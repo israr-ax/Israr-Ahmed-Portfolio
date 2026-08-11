@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------
+   DESIGN TOKENS
+   Subject: a backend/systems engineer's portfolio. The palette reads as
+   "terminal at night" — near-black surfaces, one violet signal color
+   standing in for a healthy process / 200 OK, and a mono face reserved
+   for anything that looks like code, a status, or a label.
+   Edit these to change the whole site's mood in one place.
+------------------------------------------------------------------- */
+@theme {
+  /* Surfaces */
+  --color-bg: #08080c;
+  --color-surface: #121218;
+  --color-surface-2: #191922;
+  --color-border: #24242f;
+
+  /* Text */
+  --color-ink: #f1f0f6;
+  --color-ink-dim: #a3a1b0;
+  --color-ink-faint: #605e6e;
+
+  /* Signal (violet) — the one accent color, used sparingly */
+  --color-signal: #8b6bf2;
+  --color-signal-bright: #b6a4ff;
+  --color-signal-dim: #5b4899;
+  --color-signal-50: rgba(139, 107, 242, 0.06);
+  --color-signal-100: rgba(139, 107, 242, 0.12);
+  --color-signal-200: rgba(139, 107, 242, 0.24);
+
+  /* Status accents (used only on tags, echoing HTTP status codes) */
+  --color-ok: #7fd8a4;
+  --color-warn: #e8b962;
+
+  /* Type */
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-fade-up: fade-up 0.8s var(--ease-out-expo) forwards;
+  --animate-blink: blink 1s step-end infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 28s linear infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-bg);
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-signal-200);
+    color: var(--color-ink);
+  }
+
+  /* Visible, deliberate focus ring for keyboard nav — never suppressed */
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Thin, dim scrollbar so it doesn't fight the dark theme */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--color-bg); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-surface-2);
+    border-radius: 8px;
+    border: 2px solid var(--color-bg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .glass {
+    background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--color-border);
+  }
+
+  .container-page {
+    @apply mx-auto w-full max-w-[1240px] px-6 sm:px-8 lg:px-10;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-signal-bright);
+  }
+}
