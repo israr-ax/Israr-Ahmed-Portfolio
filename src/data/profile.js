@@ -21,11 +21,10 @@ export const profile = {
   // No booking tool set up yet — mailto stands in until a Calendly/Cal.com
   // link exists. Swap this one string and every "Book a call" link updates.
   bookingUrl: 'mailto:israrmemon211@gmail.com?subject=Let%27s%20talk',
-  bio: [
-    "I'm a backend developer who likes the parts of the stack most people never see — the schema that holds up under load, the auth flow that can't be tricked, the WebSocket connection that stays alive.",
-    "Currently a Computer Science student at Sindh Madressatul Islam University, I spend most of my time in Django: building REST APIs with DRF, wiring up real-time features with Django Channels and Redis, and designing PostgreSQL schemas that don't fall over as data grows.",
-    "I'm quick to pick up new tools when a project calls for it, and I'm especially interested in where backend engineering meets AI and ML — building the systems that serve models, not just apps.",
-  ],
+  bio: ["I'm a backend developer who likes the parts of the stack most people never see — the schema that holds up under load, the auth flow that can't be tricked, and the WebSocket connection that stays alive.",
+"I focus on building reliable backend systems with Django and Python. I work with Django REST Framework to design APIs, Django Channels and Redis for real-time features, and PostgreSQL for data systems built to scale.",
+"I'm always exploring new tools and technologies when a project demands them, with a particular interest in the intersection of backend engineering and AI/ML — building the infrastructure and services that turn intelligent models into reliable, usable products."
+],
   education: {
     school: 'Sindh Madressatul Islam University (SMIU)',
     degree: 'B.S. Computer Science',
