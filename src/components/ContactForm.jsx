@@ -1,36 +1,39 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, Loader2, Send } from 'lucide-react'
+import { Check, Loader2, Send, AlertTriangle } from 'lucide-react'
 
-/**
- * This is a static site with no backend of its own, so submission is
- * simulated (status state machine below) rather than silently failing.
- * To make it actually deliver mail, wire `handleSubmit` to a form service —
- * Formspree, Resend, or EmailJS all work without standing up a server:
- *
- *   const res = await fetch('https://formspree.io/f/YOUR_ID', {
- *     method: 'POST',
- *     headers: { Accept: 'application/json' },
- *     body: new FormData(e.target),
- *   })
- */
+// Replace with your real Formspree endpoint (formspree.io -> New Form -> copy the URL)
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xppaogyq'
+
 export default function ContactForm() {
-  const [status, setStatus] = useState('idle') // idle | sending | sent
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
   const [values, setValues] = useState({ name: '', email: '', message: '' })
 
   const handleChange = (e) =>
     setValues((v) => ({ ...v, [e.target.name]: e.target.value }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (status !== 'idle') return
+    if (status === 'sending') return
     setStatus('sending')
-    // TODO: replace with a real form-service POST (see comment above).
-    setTimeout(() => {
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(e.target),
+      })
+
+      if (!res.ok) throw new Error('Form service rejected the submission')
+
       setStatus('sent')
       setValues({ name: '', email: '', message: '' })
       setTimeout(() => setStatus('idle'), 3000)
-    }, 1200)
+    } catch (err) {
+      console.error('Contact form submission failed:', err)
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 4000)
+    }
   }
 
   const fieldClass =
@@ -88,7 +91,7 @@ export default function ContactForm() {
 
       <motion.button
         type="submit"
-        disabled={status !== 'idle'}
+        disabled={status === 'sending'}
         whileHover={status === 'idle' ? { scale: 1.02 } : {}}
         whileTap={status === 'idle' ? { scale: 0.98 } : {}}
         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-signal px-7 py-3 font-mono text-xs uppercase tracking-wide text-bg font-medium disabled:opacity-80 hover:shadow-[0_0_32px_rgba(139,107,242,0.35)] transition-shadow"
@@ -125,6 +128,17 @@ export default function ContactForm() {
               className="inline-flex items-center gap-2"
             >
               <Check size={14} /> 201 Created
+            </motion.span>
+          )}
+          {status === 'error' && (
+            <motion.span
+              key="error"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="inline-flex items-center gap-2"
+            >
+              <AlertTriangle size={14} /> Failed — try again
             </motion.span>
           )}
         </AnimatePresence>
