@@ -1,20 +1,46 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, Loader2, Send, AlertTriangle } from 'lucide-react'
 
 // Replace with your real Formspree endpoint (formspree.io -> New Form -> copy the URL)
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xppaogyq'
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export default function ContactForm() {
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [errorMsg, setErrorMsg] = useState('')
   const [values, setValues] = useState({ name: '', email: '', message: '' })
+
+  // React state updates aren't synchronous, so a fast double-click can fire
+  // handleSubmit twice before `status` re-renders to "sending". This ref is
+  // checked/set immediately, so the second click is blocked for real.
+  const submittingRef = useRef(false)
 
   const handleChange = (e) =>
     setValues((v) => ({ ...v, [e.target.name]: e.target.value }))
 
+  const validate = () => {
+    if (!values.name.trim()) return 'Please enter your name.'
+    if (!values.email.trim()) return 'Please enter your email.'
+    if (!EMAIL_RE.test(values.email.trim())) return 'That email address doesn\'t look right.'
+    if (!values.message.trim()) return 'Please enter a message.'
+    return null
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (status === 'sending') return
+    if (submittingRef.current) return // blocks a fast double-click for real
+
+    const validationError = validate()
+    if (validationError) {
+      setStatus('error')
+      setErrorMsg(validationError)
+      setTimeout(() => setStatus('idle'), 4000)
+      return
+    }
+
+    submittingRef.current = true
     setStatus('sending')
 
     try {
@@ -32,7 +58,10 @@ export default function ContactForm() {
     } catch (err) {
       console.error('Contact form submission failed:', err)
       setStatus('error')
+      setErrorMsg('Something went wrong sending that — please try again.')
       setTimeout(() => setStatus('idle'), 4000)
+    } finally {
+      submittingRef.current = false
     }
   }
 
@@ -88,6 +117,10 @@ export default function ContactForm() {
           className={`${fieldClass} mt-2 resize-none`}
         />
       </div>
+
+      {status === 'error' && errorMsg && (
+        <p className="text-xs text-red-400 font-mono">{errorMsg}</p>
+      )}
 
       <motion.button
         type="submit"
